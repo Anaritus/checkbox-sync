@@ -8,7 +8,7 @@ end
 
 ---@return TSNode
 function M.get_current()
-	local cur_node = ts.get_node()
+	local cur_node = M.refetch_node()
 	assert(cur_node, "This aint a tree!")
 	return cur_node
 end
@@ -73,15 +73,17 @@ function M.replace_status(new_status, row, col, todo_status)
 	vim.api.nvim_buf_set_lines(0, row, row + 1, false, { new_line })
 end
 
----@param row number
----@param col number
+---@param row number?
+---@param col number?
 ---@return TSNode?
 function M.refetch_node(row, col)
 	local parser = M.get_parser()
 	parser:invalidate()
-	return ts.get_node({
-		bufnr = 0,
-		pos = { row, col },
-	})
+	if row and col then
+		return ts.get_node({
+			pos = { row, col },
+		})
+	end
+	return ts.get_node()
 end
 return M
