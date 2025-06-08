@@ -20,6 +20,7 @@ M.confing = {
 function M.update(node, down)
 	local parser = utils.get_parser()
 	assert(parser:lang() == "markdown", "Callback should be called only inside of markdown!")
+	parser:invalidate()
 	local cur_list_item = utils.get_list_item(node or utils.get_current())
 	if not cur_list_item then
 		return
