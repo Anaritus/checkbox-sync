@@ -12,8 +12,6 @@ M.config = {
 	insert_leave = true,
 }
 
-M.tree_printed = false
-
 ---Update node status under cursor. Will not trigger update of upper nodes
 ---
 ---@param node TSNode? Node to update. Defaults to node under cursor
