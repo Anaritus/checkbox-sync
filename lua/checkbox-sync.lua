@@ -76,7 +76,6 @@ function M.update(node, down)
 	if new_status ~= status then
 		assert(col and row, "Will never fire, needed for lua ls")
 		utils.replace_status(new_status, row, col, M.confing.todo_status)
-		vim.cmd("silent! w")
 	end
 	return row, col
 end
