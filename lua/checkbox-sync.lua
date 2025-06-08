@@ -25,7 +25,7 @@ function M.update(node, down)
 		return
 	end
 
-	local status, row, col = utils.get_status(cur_list_item)
+	local status, row, col = utils.get_status(cur_list_item, M.confing.todo_status)
 	if not status then
 		return
 	end
@@ -41,7 +41,7 @@ function M.update(node, down)
 	local has_todo = false
 	local update_children = down and (status == "[ ]" or status == "[x]")
 	for item in list:iter_children() do
-		local item_status, item_row, item_col = utils.get_status(item)
+		local item_status, item_row, item_col = utils.get_status(item, M.confing.todo_status)
 		if vim.tbl_contains({
 			M.confing.todo_status,
 			"[ ]",
@@ -49,7 +49,7 @@ function M.update(node, down)
 		}, item_status) then
 			if update_children then
 				assert(item_col and item_row, "Will never fire, needed for lua ls")
-				utils.replace_status(status, item_row, item_col)
+				utils.replace_status(status, item_row, item_col, M.confing.todo_status)
 			end
 		end
 		if item_status == "[x]" then
@@ -75,7 +75,7 @@ function M.update(node, down)
 	end
 	if new_status ~= status then
 		assert(col and row, "Will never fire, needed for lua ls")
-		utils.replace_status(new_status, row, col)
+		utils.replace_status(new_status, row, col, M.confing.todo_status)
 		vim.cmd("silent! w")
 	end
 	return row, col
