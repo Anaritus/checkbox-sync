@@ -78,7 +78,7 @@ end
 ---@return TSNode?
 function M.refetch_node(row, col)
 	local parser = M.get_parser()
-	parser:invalidate()
+	parser:parse()
 	if row and col then
 		return ts.get_node({
 			pos = { row, col },

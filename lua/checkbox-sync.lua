@@ -3,7 +3,7 @@ local utils = require("checkbox-sync.utils")
 local M = {}
 
 ---@class CheckboxSync.Config
-M.confing = {
+M.config = {
 
 	---@type string
 	todo_status = "[-]",
@@ -11,6 +11,8 @@ M.confing = {
 	---@type boolean
 	insert_leave = true,
 }
+
+M.tree_printed = false
 
 ---Update node status under cursor. Will not trigger update of upper nodes
 ---
@@ -25,7 +27,7 @@ function M.update(node, down)
 		return
 	end
 
-	local status, row, col = utils.get_status(cur_list_item, M.confing.todo_status)
+	local status, row, col = utils.get_status(cur_list_item, M.config.todo_status)
 	if not status then
 		return
 	end
@@ -41,15 +43,15 @@ function M.update(node, down)
 	local has_todo = false
 	local update_children = down and (status == "[ ]" or status == "[x]")
 	for item in list:iter_children() do
-		local item_status, item_row, item_col = utils.get_status(item, M.confing.todo_status)
+		local item_status, item_row, item_col = utils.get_status(item, M.config.todo_status)
 		if vim.tbl_contains({
-			M.confing.todo_status,
+			M.config.todo_status,
 			"[ ]",
 			"[x]",
 		}, item_status) then
 			if update_children then
 				assert(item_col and item_row, "Will never fire, needed for lua ls")
-				utils.replace_status(status, item_row, item_col, M.confing.todo_status)
+				utils.replace_status(status, item_row, item_col, M.config.todo_status)
 			end
 		end
 		if item_status == "[x]" then
@@ -58,7 +60,7 @@ function M.update(node, down)
 		if item_status == "[ ]" then
 			has_empty = true
 		end
-		if item_status == M.confing.todo_status then
+		if item_status == M.config.todo_status then
 			has_todo = true
 		end
 	end
@@ -67,15 +69,15 @@ function M.update(node, down)
 	end
 	local new_status = status
 	if has_empty then
-		new_status = (has_done or has_todo) and M.confing.todo_status or "[ ]"
+		new_status = (has_done or has_todo) and M.config.todo_status or "[ ]"
 	elseif has_todo then
-		new_status = M.confing.todo_status
+		new_status = M.config.todo_status
 	elseif has_done then
 		new_status = "[x]"
 	end
 	if new_status ~= status then
 		assert(col and row, "Will never fire, needed for lua ls")
-		utils.replace_status(new_status, row, col, M.confing.todo_status)
+		utils.replace_status(new_status, row, col, M.config.todo_status)
 	end
 	return row, col
 end
@@ -101,12 +103,11 @@ end
 
 ---@param opts CheckboxSync.Config?
 function M.setup(opts)
-	M.confing = vim.tbl_extend("force", M.confing, opts)
-	if M.confing.insert_leave then
+	M.config = vim.tbl_extend("force", M.config, opts)
+	if M.config.insert_leave then
 		vim.api.nvim_create_autocmd("InsertLeave", {
 			pattern = "*.md",
 			callback = function()
-				M.update()
 				M.update_ancestors()
 			end,
 		})
