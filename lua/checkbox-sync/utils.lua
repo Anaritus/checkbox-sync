@@ -37,7 +37,10 @@ M.parsed_query = ts.query.parse("markdown", query)
 function M.get_status(list_item, todo_status)
 	assert(list_item:type() == "list_item", "Item should be of type list_item")
 	local body = list_item:child(1)
-	assert(body, "At this point should not fire. Somthing is wrong with parser if it does")
+	if not body then
+		-- Means that we are on a list with nothing inside of it.
+		return
+	end
 	local row, col = body:start()
 	if body:type() == "task_list_marker_checked" or body:type() == "task_list_marker_unchecked" then
 		return ts.get_node_text(body, 0), row, col
