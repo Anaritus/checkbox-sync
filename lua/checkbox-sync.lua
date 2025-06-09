@@ -84,7 +84,12 @@ end
 ---
 ---@param node TSNode? When specified, updates ancestors of the given node instead
 function M.update_ancestors(node)
-	local cur_node = utils.get_list_item(node or utils.get_current()):parent()
+	local cur_list = utils.get_list_item(node or utils.get_current())
+	if not cur_list then
+		return
+	end
+
+	local cur_node = cur_list:parent()
 
 	if not cur_node then
 		return
